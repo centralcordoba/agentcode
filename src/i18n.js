@@ -13,6 +13,11 @@ const messages = {
     languageSet: (name) => `Language set to: ${name}`,
     languageUsage: 'Usage: /lang [en|es]',
     noUsage: 'No usage yet in this session.',
+    compactUsage: 'Usage: /compact [N]   (N = number of recent messages to keep, min 4)',
+    compactStarting: (keep) => `Compacting session, keeping the last ${keep} messages...`,
+    compactSkipped: (reason) => `Nothing to compact (${reason}).`,
+    compactDone: (n, before, after) => `Summarized ${n} messages. Session went from ${before} to ${after} messages.`,
+    compactCost: (cost) => `Summarizer cost: $${cost}`,
     unknownCommand: (cmd) => `Unknown command: ${cmd}. Try /help.`,
     approvePlan: 'Approve plan?',
     planLabel: 'Plan',
@@ -34,6 +39,11 @@ const messages = {
     languageSet: (name) => `Idioma cambiado a: ${name}`,
     languageUsage: 'Uso: /lang [en|es]',
     noUsage: 'Todavía no hay uso en esta sesión.',
+    compactUsage: 'Uso: /compact [N]   (N = cantidad de mensajes recientes a conservar, mínimo 4)',
+    compactStarting: (keep) => `Compactando sesión, conservando los últimos ${keep} mensajes...`,
+    compactSkipped: (reason) => `Nada para compactar (${reason}).`,
+    compactDone: (n, before, after) => `Resumidos ${n} mensajes. La sesión pasó de ${before} a ${after} mensajes.`,
+    compactCost: (cost) => `Costo del resumen: $${cost}`,
     unknownCommand: (cmd) => `Comando desconocido: ${cmd}. Probá /help.`,
     approvePlan: '¿Aprobar plan?',
     planLabel: 'Plan',
@@ -61,6 +71,7 @@ ${bold('COMMANDS')}
                         ${dim('e.g.: /model anthropic/claude-sonnet-4.6')}
   /plan [on|off]        plan-before-act: agent proposes a plan and waits for approval
   /lang [en|es]         change UI and model response language (works mid-session)
+  /compact [N]          summarize old turns to free up context (keeps last N=30 messages)
   /cost                 show tokens used and accumulated cost
 
 ${bold('SPECIAL SYNTAX')}
@@ -101,6 +112,10 @@ ${bold('EXAMPLES')}
   > /lang es
   ${dim('  next turn responds in Spanish; previous history stays unchanged')}
 
+  ${dim('# free up context after a long session')}
+  > /compact
+  ${dim('  summarizes the older messages so subsequent turns cost less tokens')}
+
 ${bold('PERSISTENT CONTEXT')}
   This session is saved in ~/.agentcode/sessions/
   Resume later with: ${dim('agent --continue')}
@@ -120,6 +135,7 @@ ${bold('COMANDOS')}
                         ${dim('ej: /model anthropic/claude-sonnet-4.6')}
   /plan [on|off]        plan-before-act: el agente propone un plan y espera aprobación
   /lang [en|es]         cambia idioma de UI y respuestas del modelo (funciona a mitad de sesión)
+  /compact [N]          resume turnos viejos para liberar contexto (conserva últimos N=30 mensajes)
   /cost                 muestra tokens usados y costo acumulado
 
 ${bold('SINTAXIS ESPECIAL')}
@@ -159,6 +175,10 @@ ${bold('EJEMPLOS')}
   ${dim('# cambiar idioma a mitad de sesión')}
   > /lang en
   ${dim('  el próximo turno responde en inglés; el historial previo queda igual')}
+
+  ${dim('# liberar contexto después de una sesión larga')}
+  > /compact
+  ${dim('  resume los mensajes viejos para que los próximos turnos cuesten menos tokens')}
 
 ${bold('CONTEXTO PERSISTENTE')}
   Esta sesión se guarda en ~/.agentcode/sessions/

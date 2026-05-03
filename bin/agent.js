@@ -33,7 +33,7 @@ if (flags.has('help')) {
   console.log('  --help, -h        Show this help');
   console.log('  (no task)         Enter interactive REPL mode');
   console.log('');
-  console.log('REPL commands: /help /exit /clear /model /plan /lang /cost');
+  console.log('REPL commands: /help /exit /clear /model /plan /lang /compact /cost');
   process.exit(0);
 }
 

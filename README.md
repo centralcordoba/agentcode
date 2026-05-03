@@ -119,6 +119,7 @@ Escribí una tarea. /help para comandos. /exit para salir.
 | `/model [slug]` | Ver/cambiar modelo: `/model anthropic/claude-sonnet-4.6` |
 | `/plan [on\|off]` | Activar/desactivar plan-before-act |
 | `/lang [en\|es]` | Cambiar idioma de interfaz y respuestas |
+| `/compact [N]` | Resumir mensajes viejos para liberar contexto (conserva últimos N=30) |
 | `/cost` | Ver tokens y costo acumulado |
 
 ### Sintaxis especial
@@ -294,8 +295,9 @@ podés modificar exactamente como quieras.
 - **Costo por modelo no se trackea cross-switch.** Si cambiás `/model`
   a mitad de sesión, los tokens viejos se calculan con el precio del
   modelo nuevo (sobrestima/subestima según dirección del cambio).
-- **Sin compresión de contexto.** Después de muchos turnos, el historial
-  crece y los tokens también. Usá `/clear` cuando se vaya de mano.
+- **Compresión de contexto manual.** Existe `/compact` para resumir mensajes
+  viejos en sesiones largas, pero no se dispara solo — vos lo invocás cuando
+  ves los tokens crecer.
 - **No hay tests automáticos.** Cada feature se valida manualmente con
   un `node -e` smoke test. Suficiente para un MVP, no para producción.
 - **Sólo OpenRouter.** Hubo soporte para Ollama (local), se removió por
@@ -309,8 +311,6 @@ podés modificar exactamente como quieras.
 
 Funcionalidades que tienen sentido y todavía no están:
 
-- **Compresión de contexto** (`/compact`): resumir turnos viejos para
-  bajar tokens en sesiones largas.
 - **Subagentes**: delegar sub-tareas en paralelo, cada uno con su propio
   scratch space.
 - **`glob` y `grep` separados** con filtros (tipo de archivo, regex), en
@@ -331,6 +331,7 @@ src/model.js          ← OpenRouter streaming + pricing/cost
 src/tools.js          ← las 7 tools, sandbox de paths, lista destructiva
 src/confirm.js        ← preview de diff + prompt y/N
 src/context.js        ← buildSystemPrompt, expandMentions, AGENT.md, write-tool gate
+src/compact.js        ← /compact: resume mensajes viejos via el modelo activo
 src/session.js        ← create/load/save de sesiones JSON
 src/repl.js           ← loop interactivo + slash commands
 src/io.js             ← readline singleton compartido por REPL y confirm()

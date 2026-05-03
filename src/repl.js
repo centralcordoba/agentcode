@@ -4,6 +4,7 @@ import { saveSession } from './session.js';
 import { getReadline } from './io.js';
 import { t } from './i18n.js';
 import { setLanguage, getLanguage, languageName, loadConfig, saveConfig } from './config.js';
+import { compactSession } from './compact.js';
 
 export async function runRepl(session, sessionPath) {
   console.log(`[MODEL: ${activeModel()}]`);
@@ -26,7 +27,7 @@ export async function runRepl(session, sessionPath) {
     if (!input) continue;
 
     if (input.startsWith('/')) {
-      const stop = await handleCommand(input, session);
+      const stop = await handleCommand(input, session, sessionPath);
       if (stop) break;
       continue;
     }
@@ -42,7 +43,7 @@ export async function runRepl(session, sessionPath) {
   }
 }
 
-async function handleCommand(line, session) {
+async function handleCommand(line, session, sessionPath) {
   const [cmd, ...rest] = line.split(/\s+/);
   switch (cmd) {
     case '/exit':
@@ -92,6 +93,10 @@ async function handleCommand(line, session) {
       }
       return false;
 
+    case '/compact':
+      await runCompact(session, rest, sessionPath);
+      return false;
+
     case '/cost':
       await showCost(session);
       return false;
@@ -110,6 +115,31 @@ function printHelp() {
   const dim = (s) => `\x1b[2m${s}\x1b[0m`;
   const bold = (s) => `\x1b[1m${s}\x1b[0m`;
   console.log(t('helpText', { dim, bold }));
+}
+
+async function runCompact(session, args, sessionPath) {
+  let keep = 30;
+  if (args.length > 0) {
+    const n = parseInt(args[0], 10);
+    if (!Number.isFinite(n) || n < 4) {
+      console.log(t('compactUsage'));
+      return;
+    }
+    keep = n;
+  }
+  console.log(t('compactStarting', keep));
+  const result = await compactSession(session, { keep });
+  if (result.skipped) {
+    console.log(t('compactSkipped', result.reason));
+    return;
+  }
+  saveSession(session, sessionPath);
+  console.log(t('compactDone', result.summarized, result.before, result.after));
+  if (result.summarizerUsage) {
+    const pricing = await getPricing(activeModel());
+    const cost = computeCost(result.summarizerUsage, pricing);
+    if (cost != null) console.log(t('compactCost', cost.toFixed(4)));
+  }
 }
 
 async function showCost(session) {

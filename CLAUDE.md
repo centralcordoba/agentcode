@@ -61,7 +61,7 @@ Save granularity is per completed turn (after `final` or hitting `MAX_STEPS`). A
 
 REPL and `confirm()` share a singleton readline via `getReadline()`. Do not create a per-prompt readline anywhere — that pattern caused stdin contention on Windows and was deliberately removed.
 
-Slash commands: `/help /exit /clear /model [slug] /plan [on|off] /cost`. `/clear` wipes `messages` + `totalUsage` in memory; the next save overwrites the session file with the empty state.
+Slash commands: `/help /exit /clear /model [slug] /plan [on|off] /lang [en|es] /compact [N] /cost`. `/clear` wipes `messages` + `totalUsage` in memory; the next save overwrites the session file with the empty state. `/compact` (in `src/compact.js`) calls the active model with a custom prompt to summarize all but the last `N` (default 30) messages and replaces them with a single synthetic `[CONTEXT SUMMARY: ...]` user message; saves immediately. The summarizer reuses `callModel`, so it benefits from the same streaming + json_object format and inherits whatever model is active — switch to a cheap model before `/compact` if cost matters.
 
 ### Plan mode
 
