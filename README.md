@@ -13,9 +13,9 @@ $ agent "agregá tests al modulo de auth y corré la suite"
 → step 1: read_file(path=src/auth.js)
 ✻ Genero tests/auth.test.js
 → step 2: write_file(path=tests/auth.test.js, ...)
-Apply write to tests/auth.test.js? [y/N]: y
+Apply write to tests/auth.test.js? [y/N/a=all]: a
+· auto-approve enabled for the rest of this session (cleared by /clear)
 → step 3: run_command(cmd=npm test)
-Run command: npm test? [y/N]: y
 
 ✔ Tests creados y pasando (3/3 verde).
 [3 steps · 4.812 in / 482 out tokens · $0.0021]
@@ -31,7 +31,8 @@ Run command: npm test? [y/N]: y
 - **Siete tools** sobre el filesystem y el shell: leer/listar/buscar/editar
   archivos, ver `git diff`, aplicar patches, correr comandos.
 - **Confirmación humana** antes de cualquier cosa con efectos secundarios.
-  Las lecturas pasan directo; las escrituras te muestran un diff y piden y/N.
+  Las lecturas pasan directo; las escrituras te muestran un diff y piden
+  `y/N/a=all` (donde `a` aprueba todo lo que sigue hasta `/clear` o salir).
 - **REPL persistente** (`agent` sin args) con historial guardado en
   `~/.agentcode/sessions/`. Volvés con `agent --continue`.
 - **`@mentions`**: referenciá archivos en línea (`@src/auth.js`) y el agente
@@ -115,12 +116,33 @@ Escribí una tarea. /help para comandos. /exit para salir.
 |---|---|
 | `/help` | Ayuda completa con ejemplos |
 | `/exit`, `/quit` | Salir |
-| `/clear` | Borrar el historial (la sesión queda abierta) |
+| `/clear` | Borrar el historial **y resetear el auto-aprobar de `a=all`** (la sesión queda abierta) |
 | `/model [slug]` | Ver/cambiar modelo: `/model anthropic/claude-sonnet-4.6` |
 | `/plan [on\|off]` | Activar/desactivar plan-before-act |
 | `/lang [en\|es]` | Cambiar idioma de interfaz y respuestas |
 | `/compact [N]` | Resumir mensajes viejos para liberar contexto (conserva últimos N=30) |
 | `/cost` | Ver tokens y costo acumulado |
+
+### Confirmaciones (`y/N/a=all`)
+
+Cada vez que el agente quiere modificar algo, te muestra el diff o el comando
+y pregunta:
+
+```
+Apply edit to src/auth.js? [y/N/a=all]: _
+```
+
+| Respuesta | Efecto |
+|---|---|
+| `y` o `yes` | aprueba sólo este cambio |
+| `N`, `n`, Enter, cualquier otra | rechaza |
+| `a` o `all` | aprueba este **y todos los siguientes** hasta que hagas `/clear` o salgas del REPL |
+
+`a=all` es útil cuando ya leíste el primer diff, viste que el agente entiende
+la tarea y querés dejarlo correr sin interrumpir cada cambio. Equivale a
+activar `--yes` a mitad de sesión. `/clear` resetea el flag (junto con el
+historial). Si arrancaste con `agent --yes`, el flag ya estaba activo desde
+el principio y `/clear` no lo apaga (vino de la flag, no del prompt).
 
 ### Sintaxis especial
 

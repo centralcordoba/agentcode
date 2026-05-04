@@ -4,14 +4,25 @@ import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { getReadline } from './io.js';
 
+let stickyApprove = false;
+
 export function autoApprove() {
-  return process.env.AGENT_AUTO_APPROVE === '1';
+  return process.env.AGENT_AUTO_APPROVE === '1' || stickyApprove;
+}
+
+export function clearStickyApprove() {
+  stickyApprove = false;
 }
 
 export async function confirm(prompt) {
   if (autoApprove()) return true;
   const rl = getReadline();
-  const answer = (await rl.question(`${prompt} [y/N]: `)).trim().toLowerCase();
+  const answer = (await rl.question(`${prompt} [y/N/a=all]: `)).trim().toLowerCase();
+  if (answer === 'a' || answer === 'all') {
+    stickyApprove = true;
+    console.log('\x1b[2m· auto-approve enabled for the rest of this session (cleared by /clear)\x1b[0m');
+    return true;
+  }
   return answer === 'y' || answer === 'yes';
 }
 

@@ -66,7 +66,7 @@ function helpEn({ dim, bold }) {
 ${bold('COMMANDS')}
   /help                 show this help
   /exit, /quit          exit the REPL
-  /clear                clear conversation history (session stays open)
+  /clear                clear conversation history AND reset auto-approve (session stays open)
   /model [slug]         show or change the active model
                         ${dim('e.g.: /model anthropic/claude-sonnet-4.6')}
   /plan [on|off]        plan-before-act: agent proposes a plan and waits for approval
@@ -78,14 +78,22 @@ ${bold('SPECIAL SYNTAX')}
   ${dim('@<file>')}               inject the file's contents into your prompt
                         ${dim('e.g.: > review the bug in @src/auth.js using @package.json')}
 
+${bold('CONFIRMATION PROMPTS')}
+  Before any write/edit/patch/run_command the agent shows a diff or command
+  preview and asks ${dim('[y/N/a=all]')}:
+    ${dim('y, yes')}              approve this single change
+    ${dim('N, n, anything else')} reject (default if you press Enter)
+    ${dim('a, all')}              approve this AND every following prompt until /clear or exit
+                        ${dim('(equivalent to flipping --yes mid-session)')}
+
 ${bold('WHAT THE AGENT CAN DO')}
   Reads, searches and modifies code. Runs commands. Applies patches.
-  Asks for confirmation before any change (unless you use --yes).
+  Asks for confirmation before any change (unless you use --yes or answer "a").
 
   Internal tools:
     read_file, list_files, search_repo, git_diff   ${dim('(read-only, no prompt)')}
-    edit_file, write_file, apply_patch             ${dim('(modify files, ask y/N)')}
-    run_command                                    ${dim('(run shell, asks y/N)')}
+    edit_file, write_file, apply_patch             ${dim('(modify files, ask y/N/a)')}
+    run_command                                    ${dim('(run shell, asks y/N/a)')}
 
 ${bold('EXAMPLES')}
   ${dim('# explore')}
@@ -130,7 +138,7 @@ function helpEs({ dim, bold }) {
 ${bold('COMANDOS')}
   /help                 muestra esta ayuda
   /exit, /quit          salir del REPL
-  /clear                borra el historial de la sesión (queda abierta)
+  /clear                borra el historial Y resetea auto-aprobación (la sesión queda abierta)
   /model [slug]         muestra o cambia el modelo activo
                         ${dim('ej: /model anthropic/claude-sonnet-4.6')}
   /plan [on|off]        plan-before-act: el agente propone un plan y espera aprobación
@@ -142,14 +150,22 @@ ${bold('SINTAXIS ESPECIAL')}
   ${dim('@<archivo>')}            inyecta el contenido del archivo en tu prompt
                         ${dim('ej: > revisá el bug en @src/auth.js usando @package.json')}
 
+${bold('PROMPT DE CONFIRMACIÓN')}
+  Antes de cualquier escritura/edición/patch/run_command el agente muestra un
+  diff o preview del comando y pregunta ${dim('[y/N/a=all]')}:
+    ${dim('y, yes')}              aprueba sólo este cambio
+    ${dim('N, n, cualquier otra')} rechaza (default si pulsás Enter)
+    ${dim('a, all')}              aprueba este Y todos los siguientes hasta /clear o salir
+                        ${dim('(equivalente a activar --yes a mitad de sesión)')}
+
 ${bold('QUÉ HACE EL AGENTE')}
   Lee, busca y modifica código. Corre comandos. Aplica patches.
-  Pide confirmación antes de cualquier cambio (a menos que uses --yes).
+  Pide confirmación antes de cualquier cambio (a menos que uses --yes o respondas "a").
 
   Tools internas:
     read_file, list_files, search_repo, git_diff   ${dim('(lectura, sin confirmación)')}
-    edit_file, write_file, apply_patch             ${dim('(modifican archivos, piden y/N)')}
-    run_command                                    ${dim('(corre shell, pide y/N)')}
+    edit_file, write_file, apply_patch             ${dim('(modifican archivos, piden y/N/a)')}
+    run_command                                    ${dim('(corre shell, pide y/N/a)')}
 
 ${bold('EJEMPLOS')}
   ${dim('# explorar')}

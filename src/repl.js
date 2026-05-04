@@ -5,6 +5,7 @@ import { getReadline } from './io.js';
 import { t } from './i18n.js';
 import { setLanguage, getLanguage, languageName, loadConfig, saveConfig } from './config.js';
 import { compactSession } from './compact.js';
+import { clearStickyApprove } from './confirm.js';
 
 export async function runRepl(session, sessionPath) {
   console.log(`[MODEL: ${activeModel()}]`);
@@ -53,6 +54,7 @@ async function handleCommand(line, session, sessionPath) {
     case '/clear':
       session.messages = [];
       session.totalUsage = { prompt_tokens: 0, completion_tokens: 0 };
+      clearStickyApprove();
       console.log(t('historyCleared'));
       return false;
 
